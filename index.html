@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrinkMe - Fresh Smoothie & Fruit Juice Experience</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- Interactive Canvas Layer (Ice Cubes, Condensation, Mist, Fruits) -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Header / Navbar -->
+    <header class="navbar flex items-center justify-between z-40">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl glass-panel flex items-center justify-center shadow-lg border border-white/60">
+                <span class="text-2xl animate-pulse">🥑</span>
+            </div>
+            <div>
+                <h1 class="font-brand text-3xl font-bold tracking-tight text-slate-900 leading-none">DrinkMe</h1>
+                <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-0.5">Real Fruit Juice & Smoothies</p>
+            </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-2 glass-pill px-4 py-1.5 rounded-full text-xs font-semibold text-slate-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span>สดชื่นแท้จากธรรมชาติ 100% ไม่เติมน้ำตาลทรายขาว</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- Audio Toggle Button -->
+            <button id="btn-sound" class="glass-pill px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-2 hover:bg-white transition-all text-slate-700 shadow-sm" title="เปิด/ปิดเสียงเอฟเฟกต์">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <span class="hidden sm:inline">เสียง: เปิด</span>
+            </button>
+            <!-- Order Now CTA Header -->
+            <button id="btn-open-order" class="btn-primary text-xs !py-2 !px-4">
+                <span>🛒 สั่งความสดชื่น</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Showcase Section -->
+    <main class="relative z-20 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 pt-24 pb-8 flex flex-col justify-center">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <!-- Left Column: Story, Title, Ingredients Breakdown -->
+            <div class="lg:col-span-4 flex flex-col gap-5 text-left order-2 lg:order-1">
+                
+                <!-- Badge Tag -->
+                <div class="inline-flex items-center gap-2">
+                    <span id="drink-badge" class="glass-pill text-[11px] font-bold px-3 py-1 rounded-full text-emerald-800 border border-emerald-200">
+                        100% Real Fruit • Farm Fresh
+                    </span>
+                </div>
+
+                <!-- Main Titles -->
+                <div>
+                    <h2 id="drink-name-th" class="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
+                        อะโวคาโด สมูทตี้
+                    </h2>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span id="drink-name-en" class="text-lg font-bold text-slate-600">Avocado Smoothie</span>
+                        <span id="drink-edition" class="text-sm font-semibold text-emerald-700">[ Classic Cow Milk ]</span>
+                    </div>
+                </div>
+
+                <!-- Price and Volume Pill -->
+                <div class="flex items-center gap-3">
+                    <div class="glass-panel px-4 py-2 rounded-2xl flex items-baseline gap-1 border border-white/80">
+                        <span class="text-xs font-bold text-slate-500">ราคา</span>
+                        <span id="drink-price" class="text-3xl font-black text-slate-900">฿130</span>
+                    </div>
+                    <span class="text-xs font-bold text-slate-500 glass-pill px-3 py-1.5 rounded-xl">ขวดแก้ว 330 ml</span>
+                </div>
+
+                <!-- Description -->
+                <p id="drink-desc" class="text-sm text-slate-600 leading-relaxed font-normal">
+                    ความละมุนจากอะโวคาโดพันธุ์แฮสสด ผสานนมโคสดคุณภาพสูงจากฟาร์มโคนมชั้นเลิศ รสสัมผัสเนียนนุ่ม หอมมันธรรมชาติอย่างลงตัว ให้พลังงานสะอาดเพื่อวันสดใสของคุณ
+                </p>
+
+                <!-- Interactive Ingredients Section (แกะสูตรส่วนผสม) -->
+                <div class="pt-2">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <span>🌿</span> วัตถุดิบและส่วนผสมแท้ (คลิกเพื่อดูสรรพคุณ)
+                        </h3>
+                        <span class="text-[10px] text-emerald-700 font-bold">เกรดพรีเมียม 100%</span>
+                    </div>
+                    <div id="ingredients-container" class="flex flex-col gap-2.5">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Nutrition Mini Grid -->
+                <div class="grid grid-cols-4 gap-2 pt-2">
+                    <div class="glass-pill p-2 rounded-xl text-center">
+                        <span class="block text-[10px] font-bold text-slate-400">พลังงาน</span>
+                        <span id="nut-calories" class="text-xs font-black text-slate-800">280 kcal</span>
+                    </div>
+                    <div class="glass-pill p-2 rounded-xl text-center">
+                        <span class="block text-[10px] font-bold text-slate-400">โปรตีน</span>
+                        <span id="nut-protein" class="text-xs font-black text-slate-800">7.2 g</span>
+                    </div>
+                    <div class="glass-pill p-2 rounded-xl text-center">
+                        <span class="block text-[10px] font-bold text-slate-400">ไขมันดี</span>
+                        <span id="nut-fats" class="text-xs font-black text-slate-800">16.5 g</span>
+                    </div>
+                    <div class="glass-pill p-2 rounded-xl text-center">
+                        <span class="block text-[10px] font-bold text-slate-400">ไฟเบอร์</span>
+                        <span id="nut-fiber" class="text-xs font-black text-slate-800">8.0 g</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Center Column: 3D Bottle Showcase & Interactive Stage -->
+            <div class="lg:col-span-4 flex flex-col items-center justify-center order-1 lg:order-2">
+                
+                <!-- Bottle Stage with 3D Parallax & Physics -->
+                <div class="bottle-stage">
+                    
+                    <!-- Prev Nav Arrow -->
+                    <button id="btn-prev" class="absolute -left-3 sm:-left-6 z-30 w-11 h-11 rounded-full glass-panel flex items-center justify-center hover:scale-110 active:scale-95 transition-all text-slate-700 shadow-md" aria-label="Previous Flavor">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+
+                    <!-- Next Nav Arrow -->
+                    <button id="btn-next" class="absolute -right-3 sm:-right-6 z-30 w-11 h-11 rounded-full glass-panel flex items-center justify-center hover:scale-110 active:scale-95 transition-all text-slate-700 shadow-md" aria-label="Next Flavor">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+
+                    <!-- 3D Bottle Wrapper -->
+                    <div id="bottle-wrapper" class="bottle-3d-wrapper" title="เลื่อนเมาส์เพื่อหมุนขวด 3D หรือคลิกปุ่มเขย่า">
+                        
+                        <div id="bottle-container" class="bottle-container">
+                            
+                            <!-- Metallic Cap -->
+                            <div class="bottle-cap"></div>
+
+                            <!-- Bottle Neck -->
+                            <div class="bottle-neck">
+                                <!-- Hanging Tag (Sun or Snowflake) -->
+                                <div id="neck-tag" class="neck-tag">
+                                    <span id="tag-icon" class="tag-icon">☀️</span>
+                                    <div class="tag-subicon">
+                                        <span class="text-[10px]">🍹</span>
+                                    </div>
+                                    <span id="tag-text" class="text-[7px] font-black uppercase tracking-tighter text-slate-700 mt-1">REAL FRUIT</span>
+                                </div>
+                            </div>
+
+                            <!-- Bottle Body (Glass + Liquid + Label) -->
+                            <div class="bottle-body">
+                                
+                                <!-- Liquid Fill Layer -->
+                                <div id="liquid-layer" class="liquid-layer">
+                                    <!-- Animated Sine Wave on Liquid Surface -->
+                                    <svg class="liquid-wave" viewBox="0 0 600 28" preserveAspectRatio="none">
+                                        <path id="liquid-wave" d="M0,15 C150,0 350,30 500,15 C650,0 850,30 1000,15 L1000,28 L0,28 Z" fill="#94c243"></path>
+                                    </svg>
+                                    <!-- Internal Fizzy Micro-Bubbles -->
+                                    <div class="micro-bubbles"></div>
+                                </div>
+
+                                <!-- Brand Label (DrinkMe) -->
+                                <div id="bottle-label" class="bottle-label">
+                                    <div>
+                                        <div class="label-brand">DrinkMe</div>
+                                        <div id="label-title" class="label-title">AVOCADO SMOOTHIE</div>
+                                        <div id="label-subtitle" class="label-subtitle">REAL FRUIT JUICE</div>
+                                    </div>
+
+                                    <!-- Label Center Artwork (Avocado / Berries) -->
+                                    <div id="label-art" class="label-art-container">
+                                        <!-- SVG Rendered by JS -->
+                                    </div>
+
+                                    <div class="label-footer">
+                                        <span>100% NATURAL</span>
+                                        <span>330 ml</span>
+                                    </div>
+                                </div>
+
+                                <!-- Frost Condensation Layer -->
+                                <div id="frost-effect" class="frost-effect"></div>
+                                <div id="bottle-condensation" class="bottle-condensation"></div>
+
+                                <!-- Glass Specular Reflection Highlights -->
+                                <div class="glass-shine-left"></div>
+                                <div class="glass-shine-right"></div>
+                            </div>
+
+                            <!-- Ground Reflection & Drop Shadow -->
+                            <div class="bottle-ground-shadow"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Floating Interaction Buttons under Bottle -->
+                <div class="flex items-center gap-3 mt-4">
+                    <button id="btn-shake" class="btn-primary text-xs !py-2.5 !px-5 shadow-lg flex items-center gap-2 group">
+                        <span class="text-base group-hover:rotate-12 transition-transform">⚡</span>
+                        <span>เขย่าขวด (Shake to Mix)</span>
+                    </button>
+                    <button id="btn-deconstruct" class="btn-secondary text-xs !py-2.5 !px-4">
+                        <span>🔍 ส่องสูตรลับ</span>
+                    </button>
+                </div>
+
+                <!-- Keyboard Helper Note -->
+                <p class="text-[11px] text-slate-500 font-medium mt-3 hidden sm:block">
+                    กดปุ่ม <kbd class="px-1.5 py-0.5 rounded bg-white shadow-sm border text-[10px]">←</kbd> <kbd class="px-1.5 py-0.5 rounded bg-white shadow-sm border text-[10px]">→</kbd> เปลี่ยนเมนู | <kbd class="px-1.5 py-0.5 rounded bg-white shadow-sm border text-[10px]">Spacebar</kbd> เพื่อเขย่า
+                </p>
+
+            </div>
+
+            <!-- Right Column: Freshness Metrics, Chill Slider & Quick Order -->
+            <div class="lg:col-span-4 flex flex-col gap-5 text-left order-3">
+                
+                <!-- Freshness & Sensation Metrics Card -->
+                <div class="glass-panel p-5 rounded-3xl border border-white/80 shadow-sm flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                            <span>❄️</span> ระดับความสดชื่นและรสสัมผัส
+                        </h4>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                            เกรดพรีเมียม
+                        </span>
+                    </div>
+
+                    <!-- Progress Gauge: Coolness / Freshness -->
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-600">ความสดชื่นฉ่ำใจ (Freshness)</span>
+                            <span id="metric-coolness" class="text-slate-900 font-black">95%</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-200/60 overflow-hidden">
+                            <div id="bar-coolness" class="progress-bar-fill w-[95%]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Gauge: Smoothness -->
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-600">ความเนียนนุ่มละมุน (Smoothness)</span>
+                            <span id="metric-smoothness" class="text-slate-900 font-black">98%</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-200/60 overflow-hidden">
+                            <div id="bar-smoothness" class="progress-bar-fill w-[98%]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Gauge: Clean Energy -->
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-600">พลังงานสะอาดบริสุทธิ์ (Pure Energy)</span>
+                            <span id="metric-energy" class="text-slate-900 font-black">90%</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-200/60 overflow-hidden">
+                            <div id="bar-energy" class="progress-bar-fill w-[90%]"></div>
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-200/60">
+
+                    <!-- Chill & Freshness Slider -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label for="freshness-slider" class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                <span>🧊</span> จำลองระดับความเย็น
+                            </label>
+                            <span id="freshness-val-text" class="text-[11px] font-bold text-sky-700">เย็นฉ่ำ สดชื่นพิเศษ (4°C)</span>
+                        </div>
+                        <input id="freshness-slider" type="range" min="0.3" max="1.8" step="0.1" value="1.0" class="w-full accent-emerald-600 cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                            <span>เย็นปานกลาง</span>
+                            <span>เย็นฉ่ำ 4°C</span>
+                            <span>Frost -2°C</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Order Simulator Card -->
+                <div class="glass-panel p-5 rounded-3xl border border-white/80 shadow-sm flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-700 flex items-center justify-center font-bold text-sm">
+                            🛵
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-800">ส่งความสดชื่นถึงบ้านคุณ</h4>
+                            <p class="text-[11px] text-slate-500">คงความเย็นด้วยบรรจุภัณฑ์ควบคุมอุณหภูมิ</p>
+                        </div>
+                    </div>
+
+                    <button id="btn-quick-order" onclick="document.getElementById('btn-open-order').click()" class="btn-primary w-full justify-center !py-3 text-sm font-bold shadow-md">
+                        <span>สั่งเมนูนี้ทันที • </span>
+                        <span id="quick-order-price" class="underline">฿130</span>
+                    </button>
+                    
+                    <p class="text-[10px] text-center text-slate-400">
+                        ✓ ผลิตสดใหม่ขวดต่อขวด • ไม่ใส่วัตถุกันเสีย • เก็บได้ 3 วันในตู้เย็น
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Bottom Menu Navigator (4 Drink Showcase Cards) -->
+        <div class="mt-8 pt-4 border-t border-slate-200/50">
+            <div class="flex items-center justify-between mb-3 px-1">
+                <span class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                    <span>🍹</span> เลือกสัมผัสความสดชื่น 4 รสชาติเอกลักษณ์
+                </span>
+                <span class="text-xs font-bold text-slate-600">เมนูแนะนำ DrinkMe</span>
+            </div>
+            
+            <div id="menu-thumbnails" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-20 py-4 px-6 text-center text-xs text-slate-500 font-medium border-t border-white/40">
+        <p>© 2026 DrinkMe Real Fruit Juice & Smoothies. Craft Beverage Interactive Experience.</p>
+    </footer>
+
+    <!-- Ingredient Detail Modal -->
+    <div id="ingredient-modal" class="modal-overlay">
+        <div class="modal-content glass-panel p-6 sm:p-8 rounded-3xl max-w-md w-full mx-4 shadow-2xl border border-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-3xl flex items-center justify-center shadow-inner" id="modal-ingredient-icon">
+                    🥑
+                </div>
+                <button id="btn-close-ingredient-modal" class="w-8 h-8 rounded-full glass-pill flex items-center justify-center hover:bg-slate-100 text-slate-500">
+                    ✕
+                </button>
+            </div>
+            <h3 id="modal-ingredient-title" class="text-2xl font-black text-slate-900 mb-1">
+                อะโวคาโดสดสายพันธุ์แฮส
+            </h3>
+            <span id="modal-ingredient-percent" class="inline-block text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 mb-4">
+                สัดส่วน 65% ของสูตร
+            </span>
+            
+            <div class="space-y-3 text-sm text-slate-700">
+                <div class="p-3.5 rounded-2xl bg-white/70 border border-slate-100">
+                    <span class="block text-[11px] font-bold text-slate-400 mb-1">สรรพคุณเพื่อสุขภาพ</span>
+                    <p id="modal-ingredient-benefit" class="font-medium leading-relaxed"></p>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-white/70 border border-slate-100">
+                    <span class="block text-[11px] font-bold text-slate-400 mb-1">แหล่งที่มาของวัตถุดิบ</span>
+                    <p id="modal-ingredient-source" class="font-medium text-slate-600"></p>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('btn-close-ingredient-modal').click()" class="btn-primary w-full justify-center mt-6">
+                เข้าใจแล้ว • สดชื่นมั่นใจ
+            </button>
+        </div>
+    </div>
+
+    <!-- Order Simulator Customizer Modal -->
+    <div id="order-modal" class="modal-overlay">
+        <div class="modal-content glass-panel p-6 sm:p-8 rounded-3xl max-w-lg w-full mx-4 shadow-2xl border border-white">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">จำลองการสั่งซื้อเครื่องดื่ม</h3>
+                    <p id="order-modal-drink-name" class="text-xs font-bold text-emerald-700 mt-0.5">อะโวคาโด สมูทตี้</p>
+                </div>
+                <button id="btn-close-order-modal" class="w-8 h-8 rounded-full glass-pill flex items-center justify-center hover:bg-slate-100 text-slate-500">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs font-bold text-slate-700">
+                
+                <!-- Sweetness Selection -->
+                <div>
+                    <span class="block text-slate-500 mb-2">เลือกระดับความหวาน (น้ำตาลธรรมชาติ)</span>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button class="sweetness-opt p-2.5 rounded-xl border border-slate-200 text-center hover:border-emerald-600" data-val="0%">0% ไม่หวาน</button>
+                        <button class="sweetness-opt p-2.5 rounded-xl border border-slate-200 text-center hover:border-emerald-600" data-val="25%">25% หวานน้อย</button>
+                        <button class="sweetness-opt p-2.5 rounded-xl border border-slate-200 text-center bg-emerald-600 text-white" data-val="50%">50% กลมกล่อม</button>
+                        <button class="sweetness-opt p-2.5 rounded-xl border border-slate-200 text-center hover:border-emerald-600" data-val="100%">100% ต้นตำรับ</button>
+                    </div>
+                </div>
+
+                <!-- Add-ons Selection -->
+                <div>
+                    <span class="block text-slate-500 mb-2">ท็อปปิ้งเสริมคุณค่าทางอาหาร</span>
+                    <div class="space-y-2">
+                        <label class="flex items-center justify-between p-2.5 rounded-xl bg-white/70 border border-slate-100 cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <input type="checkbox" value="chia" class="addon-checkbox rounded text-emerald-600">
+                                <span>เพิ่มเมล็ดเจียออร์แกนิก (Organic Chia Seeds)</span>
+                            </span>
+                            <span class="text-emerald-700 font-bold">+฿15</span>
+                        </label>
+                        <label class="flex items-center justify-between p-2.5 rounded-xl bg-white/70 border border-slate-100 cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <input type="checkbox" value="extra_berry" class="addon-checkbox rounded text-emerald-600">
+                                <span>เพิ่มเนื้อผลไม้แท้ดับเบิ้ล (Extra Fruit Pulp)</span>
+                            </span>
+                            <span class="text-emerald-700 font-bold">+฿20</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Quantity Selection -->
+                <div class="flex items-center justify-between pt-2">
+                    <span class="text-slate-600">จำนวนขวด</span>
+                    <div class="flex items-center gap-3">
+                        <button id="btn-qty-minus" class="w-8 h-8 rounded-full glass-pill font-black flex items-center justify-center hover:bg-white">-</button>
+                        <span id="order-qty" class="text-base font-black text-slate-900 w-6 text-center">1</span>
+                        <button id="btn-qty-plus" class="w-8 h-8 rounded-full glass-pill font-black flex items-center justify-center hover:bg-white">+</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Price & Submit -->
+            <div class="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-bold text-slate-400 block">ยอดรวมทั้งสิ้น</span>
+                    <span id="order-modal-price" class="text-2xl font-black text-slate-900">฿130</span>
+                </div>
+                <button id="btn-confirm-order" class="btn-primary !py-3 !px-6 text-sm">
+                    ✓ ยืนยันใส่ตะกร้า
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 glass-dark px-5 py-3 rounded-2xl shadow-2xl text-xs font-bold transition-all duration-300 opacity-0 translate-y-5 pointer-events-none max-w-sm">
+        ✨ อัปเดตเมนูสดชื่นแล้ว!
+    </div>
+
+    <!-- Scripts -->
+    <script src="audio.js"></script>
+    <script src="particles.js"></script>
+    <script src="ingredients.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

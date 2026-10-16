@@ -1,0 +1,595 @@
+/* ==========================================================================
+   DrinkMe Interactive Animation Website - Master Stylesheet
+   Modern Glassmorphism, 3D Realistic Bottle, Fluid Particle Layers
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Satisfy&display=swap');
+
+:root {
+    --primary-color: #5e8c31;
+    --accent-color: #d4a373;
+    --card-glow: rgba(94, 140, 49, 0.25);
+    --bg-gradient: radial-gradient(circle at 50% 40%, #fdfbf7 0%, #f3ece2 45%, #e6d8c4 100%);
+    --text-main: #1f2937;
+    --text-muted: #64748b;
+    --font-heading: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-script: 'Satisfy', cursive;
+    --transition-smooth: all 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--text-main);
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    transition: background 0.8s ease-in-out;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Background Canvas for Particles, Ice, and Mist */
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.glass-pill {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.glass-dark {
+    background: rgba(18, 24, 38, 0.78);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+/* Brand Logo DrinkMe Script */
+.font-brand {
+    font-family: var(--font-script);
+}
+
+/* Top Navigation Bar */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 3D Bottle Showcase Container */
+.bottle-stage {
+    position: relative;
+    width: 100%;
+    min-height: 580px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+    z-index: 20;
+}
+
+.bottle-3d-wrapper {
+    position: relative;
+    width: 250px;
+    height: 520px;
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out;
+    cursor: grab;
+}
+
+.bottle-3d-wrapper:active {
+    cursor: grabbing;
+}
+
+/* Realistic Glass Bottle Structure */
+.bottle-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 25px 35px rgba(20, 30, 15, 0.22));
+}
+
+/* Cap (Metallic Silver with Ribbing) */
+.bottle-cap {
+    width: 58px;
+    height: 34px;
+    border-radius: 6px 6px 3px 3px;
+    background: linear-gradient(90deg, #d8d8d8 0%, #ffffff 30%, #b0b0b0 60%, #8c8c8c 100%);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.9);
+    position: relative;
+    z-index: 5;
+    border-bottom: 2px solid #737373;
+}
+.bottle-cap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,0,0,0.15) 3px, rgba(0,0,0,0.15) 5px);
+    opacity: 0.6;
+}
+
+/* Bottle Neck */
+.bottle-neck {
+    width: 64px;
+    height: 95px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    z-index: 4;
+    background: var(--liquid-gradient, linear-gradient(180deg, #d4e79e 0%, #b8d96f 100%));
+    border-left: 3px solid rgba(255, 255, 255, 0.7);
+    border-right: 3px solid rgba(255, 255, 255, 0.45);
+    box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.65), inset -4px 0 8px rgba(0, 0, 0, 0.08);
+    transition: background 0.8s ease;
+}
+
+/* Hanging Neck Label Tag */
+.neck-tag {
+    position: absolute;
+    top: 15px;
+    width: 48px;
+    height: 82px;
+    border-radius: 12px 12px 24px 24px;
+    background: #e8d0b5;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 8px;
+    transition: var(--transition-smooth);
+    z-index: 10;
+}
+.neck-tag::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #333;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+}
+.tag-icon {
+    font-size: 22px;
+    margin-top: 8px;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+}
+.tag-subicon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.85);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
+
+/* Bottle Body */
+.bottle-body {
+    width: 175px;
+    height: 380px;
+    position: relative;
+    border-radius: 55px 55px 38px 38px;
+    margin-top: -20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        inset 5px 0 12px rgba(255, 255, 255, 0.7),
+        inset -5px 0 12px rgba(255, 255, 255, 0.4),
+        inset 0 -12px 18px rgba(0, 0, 0, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    z-index: 3;
+}
+
+/* Dynamic Liquid Fill with Wave Animation */
+.liquid-layer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 88%;
+    background: var(--liquid-gradient, linear-gradient(180deg, #d4e79e 0%, #9bc648 100%));
+    transition: background 0.8s ease;
+    overflow: hidden;
+}
+
+/* Liquid Surface Wave SVG */
+.liquid-wave {
+    position: absolute;
+    top: -14px;
+    left: -50%;
+    width: 200%;
+    height: 28px;
+    fill: var(--liquid-wave-color, #94c243);
+    animation: waveMotion 4s ease-in-out infinite alternate;
+}
+
+@keyframes waveMotion {
+    0% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(-25%) scaleY(1.3); }
+    100% { transform: translateX(-50%) scaleY(1); }
+}
+
+/* Internal Micro-Bubbles inside liquid */
+.micro-bubbles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+.micro-bubble {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    animation: riseUp 3.5s infinite linear;
+}
+@keyframes riseUp {
+    0% { transform: translateY(350px) scale(0.5); opacity: 0; }
+    20% { opacity: 0.8; }
+    80% { opacity: 0.8; }
+    100% { transform: translateY(-20px) scale(1.2); opacity: 0; }
+}
+
+/* Bottle Front Label */
+.bottle-label {
+    position: absolute;
+    top: 38%;
+    left: 5%;
+    right: 5%;
+    height: 168px;
+    border-radius: 18px;
+    background: #ebd7be;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,255,255,0.7);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    transition: var(--transition-smooth);
+    z-index: 12;
+    overflow: hidden;
+}
+
+.label-brand {
+    font-family: var(--font-script);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    color: #4a2c17;
+    margin-bottom: 2px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+}
+
+.label-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #4a2c17;
+}
+
+.label-subtitle {
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #63432b;
+    opacity: 0.85;
+}
+
+/* Label Artwork Illustration */
+.label-art-container {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 4px 0;
+}
+
+.label-art-img {
+    max-height: 56px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.label-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #4a2c17;
+    opacity: 0.9;
+    border-top: 1px dashed rgba(0,0,0,0.15);
+    padding-top: 3px;
+}
+
+/* Glass Specular Highlights (Left and Right reflections) */
+.glass-shine-left {
+    position: absolute;
+    top: 5%;
+    left: 8px;
+    width: 14px;
+    height: 88%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 60%, transparent 100%);
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 15;
+    filter: blur(1.5px);
+}
+
+.glass-shine-right {
+    position: absolute;
+    top: 10%;
+    right: 10px;
+    width: 6px;
+    height: 75%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 100%);
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 15;
+}
+
+/* Condensation Droplets Overlay on Bottle */
+.bottle-condensation {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 16;
+    background-image: 
+        radial-gradient(1.5px 1.5px at 25px 40px, rgba(255,255,255,0.85) 50%, transparent 100%),
+        radial-gradient(2px 2px at 45px 85px, rgba(255,255,255,0.9) 50%, transparent 100%),
+        radial-gradient(2.5px 2.5px at 130px 120px, rgba(255,255,255,0.85) 50%, transparent 100%),
+        radial-gradient(1.8px 1.8px at 90px 240px, rgba(255,255,255,0.8) 50%, transparent 100%),
+        radial-gradient(3px 3px at 35px 310px, rgba(255,255,255,0.9) 50%, transparent 100%),
+        radial-gradient(2px 2px at 145px 290px, rgba(255,255,255,0.85) 50%, transparent 100%);
+    opacity: 0.75;
+    transition: opacity 0.5s ease;
+}
+
+/* Frosting effect when chilled high */
+.frost-effect {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 80%);
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 14;
+    transition: opacity 0.5s ease;
+}
+
+/* Ground Pedestal Shadow */
+.bottle-ground-shadow {
+    position: absolute;
+    bottom: -15px;
+    width: 220px;
+    height: 35px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(30, 45, 20, 0.35) 0%, rgba(0,0,0,0.12) 50%, transparent 80%);
+    filter: blur(8px);
+    z-index: 1;
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+/* Bottle Hover/Shake Animation */
+@keyframes shakeHard {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    15% { transform: translate(-12px, -8px) rotate(-8deg); }
+    30% { transform: translate(12px, 8px) rotate(8deg); }
+    45% { transform: translate(-10px, 6px) rotate(-6deg); }
+    60% { transform: translate(10px, -6px) rotate(6deg); }
+    75% { transform: translate(-5px, 2px) rotate(-3deg); }
+    90% { transform: translate(5px, -2px) rotate(3deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.shaking {
+    animation: shakeHard 0.7s ease-in-out;
+}
+
+/* Floating Ingredients Matrix */
+.ingredient-badge {
+    position: relative;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ingredient-badge:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 18px 35px -8px var(--card-glow);
+    border-color: var(--primary-color);
+}
+
+/* Menu Thumbnail Switcher Cards */
+.menu-tab-btn {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 2px solid transparent;
+}
+
+.menu-tab-btn.active {
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 16px 32px -8px var(--card-glow);
+}
+
+/* Animated Progress Bars */
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: var(--primary-color);
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Modal Backdrops & Dialogs */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(14px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    transform: scale(0.92) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+/* Floating Action Pill Buttons */
+.btn-primary {
+    background: var(--primary-color);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.85rem 1.85rem;
+    border-radius: 9999px;
+    box-shadow: 0 12px 28px -5px var(--card-glow);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px) scale(1.03);
+    filter: brightness(1.08);
+    box-shadow: 0 18px 36px -5px var(--card-glow);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    color: var(--text-main);
+    font-weight: 600;
+    padding: 0.85rem 1.75rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+}
+
+/* Chill Freshness Slider */
+input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .bottle-stage {
+        min-height: 460px;
+    }
+    .bottle-3d-wrapper {
+        transform: scale(0.9);
+    }
+}
+
+@media (max-width: 640px) {
+    .bottle-stage {
+        min-height: 400px;
+    }
+    .bottle-3d-wrapper {
+        transform: scale(0.82);
+    }
+    .navbar {
+        padding: 1rem 1.25rem;
+    }
+}
